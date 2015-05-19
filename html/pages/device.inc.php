@@ -6,6 +6,9 @@ if ($vars['tab'] == "port" && is_numeric($vars['device']) && port_permitted($var
   $permit_ports = 1;
 }
 
+if (!is_numeric($vars['device'])) {
+  $vars['device'] = device_by_name($vars['device']);
+}
 
 if (device_permitted($vars['device']) || $check_device == $vars['device'])
 {
@@ -341,6 +344,9 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
       {
         if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
         if (is_file($configs . $device['hostname'])) { $device_config_file = $configs . $device['hostname']; }
+      }
+      if ($config['oxidized']['enabled'] === TRUE && isset($config['oxidized']['url'])) {
+          $device_config_file = TRUE;
       }
     }
 

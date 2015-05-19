@@ -240,6 +240,9 @@ function delete_device($id)
   $ret = '';
 
   $host = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?", array($id));
+  if( empty($host) ) {
+    return "No such host.";
+  }
 
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
@@ -260,7 +263,11 @@ function delete_device($id)
     }
   }
 
-  shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
+  $ex = shell_exec("bash -c '( [ ! -d ".trim($config['rrd_dir'])."/".$host." ] || rm -vrf ".trim($config['rrd_dir'])."/".$host." 2>&1 ) && echo -n OK'");
+  $tmp = explode("\n",$ex);
+  if( $tmp[sizeof($tmp)-1] != "OK" ) {
+    $ret .= "Could not remove files:\n$ex\n";
+  }
 
   $ret .= "Removed device $host\n";
   return $ret;
@@ -877,7 +884,11 @@ function is_port_valid($port, $device)
   } else {
     $valid = 1;
     $if = strtolower($port['ifDescr']);
-    foreach ($config['bad_if'] as $bi)
+    $fringe = $config['bad_if'];
+    if( is_array($config['os'][$device['os']]['bad_if']) ) {
+      $fringe = array_merge($config['bad_if'],$config['os'][$device['os']]['bad_if']);
+    }
+    foreach ($fringe as $bi)
     {
       if (strstr($if, $bi))
       {
@@ -887,7 +898,11 @@ function is_port_valid($port, $device)
     }
     if (is_array($config['bad_if_regexp']))
     {
-      foreach ($config['bad_if_regexp'] as $bi)
+      $fringe = $config['bad_if_regexp'];
+      if( is_array($config['os'][$device['os']]['bad_if_regexp']) ) {
+        $fringe = array_merge($config['bad_if_regexp'],$config['os'][$device['os']]['bad_if_regexp']);
+      }
+      foreach ($fringe as $bi)
       {
         if (preg_match($bi ."i", $if))
         {
@@ -898,7 +913,11 @@ function is_port_valid($port, $device)
     }
     if (is_array($config['bad_iftype']))
     {
-      foreach ($config['bad_iftype'] as $bi)
+      $fringe = $config['bad_iftype'];
+      if( is_array($config['os'][$device['os']]['bad_iftype']) ) {
+        $fringe = array_merge($config['bad_iftype'],$config['os'][$device['os']]['bad_iftype']);
+      }
+      foreach ($fringe as $bi)
       {
       if (strstr($port['ifType'], $bi))
         {

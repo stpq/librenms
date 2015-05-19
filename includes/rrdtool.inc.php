@@ -60,7 +60,7 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
  * @param array rrd_pipes
  */
 
-function rrdtool_pipe_close(&$rrd_process, &$rrd_pipes)
+function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
 {
   global $debug;
 
@@ -108,8 +108,8 @@ function rrdtool_graph($graph_file, $options)
     if ($config['rrdcached'])
     {
       if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== FALSE) {
-          $options = str_replace($config['rrd_dir']."/",$config['rrdcached_dir']."/",$options);
-          $options = str_replace($config['rrd_dir']    ,$config['rrdcached_dir']."/",$options);
+          $options = str_replace($config['rrd_dir']."/","./".$config['rrdcached_dir']."/",$options);
+          $options = str_replace($config['rrd_dir']    ,"./".$config['rrdcached_dir']."/",$options);
       }
       fwrite($rrd_pipes[0], "graph --daemon " . $config['rrdcached'] . " $graph_file $options");
     } else {
@@ -157,8 +157,8 @@ function rrdtool($command, $filename, $options)
   if ($command != "create" && $config['rrdcached'])
   {
       if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== FALSE) {
-          $filename = str_replace($config['rrd_dir']."/",$config['rrdcached_dir']."/",$filename);
-          $filename = str_replace($config['rrd_dir']    ,$config['rrdcached_dir']."/",$filename);
+          $filename = str_replace($config['rrd_dir']."/","./".$config['rrdcached_dir']."/",$filename);
+          $filename = str_replace($config['rrd_dir']    ,"./".$config['rrdcached_dir']."/",$filename);
       }
       $cmd = "$command $filename $options --daemon " . $config['rrdcached'];
   } else {
@@ -256,21 +256,17 @@ function rrdtool_lastupdate($filename, $options)
      
 function rrdtool_escape($string, $maxlength = NULL)
 {
-  $result = str_replace(':','\:',$string);
+  $result = shorten_interface_type($string);
   $result = str_replace('%','%%',$result);
-
-  // FIXME: should maybe also probably escape these? # \ + ? [ ^ ] ( $ ) '
-
-  $result = shorten_interface_type($result);
-
-  if ($maxlength != NULL)
-  {
-    return substr(str_pad($result, $maxlength),0,$maxlength+(strlen($result)-strlen($string)));
+  if ( is_numeric($maxlength) ) {
+    $extra  = substr_count($string,':',0,$maxlength);
+    $result = substr(str_pad($result, $maxlength),0,$maxlength+$extra);
+    if( $extra > 0 ) {
+      $result = substr($result,0,(-1*$extra));
+    }
   }
-  else
-  {
-    return $result;
-  }
+  $result = str_replace(':','\:',$result);
+  return $result." ";
 }
 
 ?>

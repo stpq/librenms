@@ -468,6 +468,10 @@ function generate_peer_url($peer, $vars=array())
   return generate_url(array('page' => 'device', 'device' => $peer['device_id'], 'tab' => 'routing', 'proto' => 'bgp'), $vars);
 }
 
+function generate_bill_url($bill, $vars=array()) {
+	return generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']), $vars);
+}
+
 function generate_port_image($args)
 {
   if (!$args['bg']) { $args['bg'] = "FFFFFF"; }
@@ -771,6 +775,35 @@ function clean_bootgrid($string) {
     $output = addslashes($output);
     return $output;
 
+}
+
+function alert_details($details) {
+    if( !is_array($details) ) {
+      $details = json_decode(gzuncompress($details),true);
+    }
+    $fault_detail = '';
+    foreach( $details['rule'] as $o=>$tmp_alerts ) {
+      $fallback = true;
+      $fault_detail .= "#".($o+1).":&nbsp;";
+      if( $tmp_alerts['bill_id'] ) {
+        $fault_detail .= '<a href="'.generate_bill_url($tmp_alerts).'">'.$tmp_alerts['bill_name'].'</a>;&nbsp;';
+        $fallback = false;
+      }
+      if( $tmp_alerts['port_id'] ) {
+        $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
+        $fallback = false;
+      }
+      if( $fallback === true ) {
+        foreach( $tmp_alerts as $k=>$v ) {
+          if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc') || stristr($k,'msg')) && substr_count($k,'_') <= 1) {
+            $fault_detail .= "$k => '$v', ";
+          }
+        }
+        $fault_detail = rtrim($fault_detail,", ");
+      }
+      $fault_detail .= "<br>";
+    }
+    return $fault_detail;
 }
 
 ?>

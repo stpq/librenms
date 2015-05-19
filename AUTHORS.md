@@ -21,7 +21,11 @@ Contributors to LibreNMS:
 - Len Lin <Ultra2D@users.noreply.github.com> (Ultra2D)
 - Christopher Freas <code@packetbusters.net> (nwautomator)
 - Stuart Henderson <stu@spacehopper.org> (sthen)
+- Filippo Giunchedi <filippo@esaurito.net> (filippog)
+- Lasse Leegaard <lasse@brandbil.dk> (lasseleegaard)
+- Mickael Marchand <mmarchand@corp.free.fr> (mmarchand)
+- Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
+- Rudy Hardeman <zarya@gigafreak.net> (zarya)
+- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 
 [1]: http://observium.org/ "Observium web site"
-
-

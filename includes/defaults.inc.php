@@ -128,6 +128,7 @@ $config['public_status']    = false; // Enable public accessable status page
 $config['old_graphs']             = 1;   // RRDfiles from before the great rra reform. This is default for a while.
 
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['customers_descr']         = 'cust';
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
@@ -214,14 +215,14 @@ $config['alert'] = array(
 			'past_60m' => 'DATE_SUB(NOW(),INTERVAL 60 MINUTE)',
 
 			//Device Macros
-			'device' => '(%devices.disabled = "0" && %devices.ignore = "0")',
-			'device_up' => '(%devices.status = "1" && %macros.device)',
-			'device_down' => '(%devices.status = "0" && %macros.device)',
+			'device' => '%devices.disabled = "0" && %devices.ignore = "0"',
+			'device_up' => '%devices.status = "1" && %macros.device',
+			'device_down' => '%devices.status = "0" && %macros.device',
 
 			//Port Macros
-			'port' => '(%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0")',
-			'port_up' => '(%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port)',
-			'port_down' => '(%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port)',
+			'port' => '%ports.deleted = "0" && %ports.ignore = "0" && %ports.disabled = "0"',
+			'port_up' => '%ports.ifOperStatus = "up" && %ports.ifAdminStatus = "up" && %macros.port',
+			'port_down' => '%ports.ifOperStatus = "down" && %ports.ifAdminStatus != "down" && %macros.port',
 			'port_usage_perc' => '((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100',
 
 			//Misc Macros
@@ -236,6 +237,7 @@ $config['alert'] = array(
 	'admins' => false,                    //Issue to administrators
 	'default_only' => false,              //Only issue to default
 	'default_mail' => '',                 //Default email
+	'tolerance-window' => 10,             //Allow +/-10s tolerance to delay values to counter cron-irregularities
 );
 
 //Legacy options
@@ -343,6 +345,8 @@ $config['billing']['base']              = 1000; # Set the base to divider bytes 
 $config['rancid_ignorecomments']        = 0; # Ignore lines starting with #
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
 #$config['smokeping']['dir']             = "/var/lib/smokeping/";
+//$config['oxidized']['enabled']         = FALSE;//Set to TRUE
+//$config['oxidized']['url']             = 'http://127.0.0.1:8888';// Set the Oxidized rest URL
 
 # NFSen RRD dir.
 $config['nfsen_enable'] = 0;
@@ -402,6 +406,9 @@ $config['bad_iftype'][] = "mpls";
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
 $config['bad_if_regexp'][] = "/^sl[0-9]/";
 
+// Rewrite Interfaces
+$config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
+
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 
 $config['ignore_mount_removable']  = 1; # Ignore removable disk storage
@@ -460,6 +467,7 @@ $config['auth_ldap_groups']['admin']['level'] = 10;
 $config['auth_ldap_groups']['pfy']['level'] = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
 $config['auth_ldap_groupmemberattr'] = "memberUid";
+$config['auth_ldap_emailattr'] = "mail";
 
 // Sensors
 
@@ -631,6 +639,7 @@ $config['dateformat']['compact']                          = "Y-m-d H:i:s";
 $config['dateformat']['time']                             = "H:i:s";
 
 $config['enable_clear_discovery']                        = 1;// Set this to 0 if you want to disable the web option to rediscover devices
+$config['enable_port_relationship']                      = TRUE;// Set this to false to not display neighbour relationships for ports
 
 $config['enable_footer']                                 = 1;// Set this to 0 if you want to disable the footer copyright in the web interface
 $config['api_demo']                                      = 0;// Set this to 1 if you want to disable some untrusting features for the API
@@ -648,5 +657,11 @@ $config['callback_clear']                                = 'https://stats.libren
 
 // Stat graphs
 $config['alert_graph_date_format']                       = '%Y-%m-%d %H:%i';
+
+// IPMI type
+$config['ipmi']['type'][]                                = "lanplus";
+$config['ipmi']['type'][]                                = "lan";
+$config['ipmi']['type'][]                                = "imb";
+$config['ipmi']['type'][]                                = "open";
 
 ?>

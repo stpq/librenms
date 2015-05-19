@@ -39,23 +39,7 @@ $rulei = 0;
 $format = $_POST['format'];
 foreach (dbFetchRows($sql,$param) as $alert) {
     $log = dbFetchCell("SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1", array($alert['rule_id'],$alert['device_id']));
-    $log_detail = json_decode(gzuncompress($log),true);
-    $fault_detail = '';
-    foreach ( $log_detail['rule'] as $o=>$tmp_alerts ) {
-      $fault_detail .= "#".($o+1).":&nbsp;";
-      $tmp = generate_port_link($tmp_alerts);
-      if( substr($tmp,-5,1) != ">" ) {
-        $fault_detail .= $tmp;
-      } else {
-        foreach ($tmp_alerts as $k=>$v) {
-          if (!empty($v) && $k != 'device_id' && (stristr($k,'id') || stristr($k,'desc') || stristr($k,'msg')) && substr_count($k,'_') <= 1) {
-            $fault_detail .= "$k => '$v', ";
-          }
-        }
-        $fault_detail = rtrim($fault_detail,", ");
-      }
-      $fault_detail .= "<br>";
-    }
+    $fault_detail = alert_details($log);
 
     $ico = "ok";
     $col = "green";

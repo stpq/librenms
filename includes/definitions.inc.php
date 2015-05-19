@@ -6,6 +6,8 @@
 #                 YES, THAT MEANS YOU                   #
 /////////////////////////////////////////////////////////
 
+umask(0002);
+
 $config['os']['default']['over'][0]['graph']       = "device_processor";
 $config['os']['default']['over'][0]['text']        = "Processor Usage";
 $config['os']['default']['over'][1]['graph']       = "device_mempool";
@@ -91,6 +93,7 @@ $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "Linux";
 $config['os'][$os]['ifXmcbc']           = 1;
+$config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_processor";
 $config['os'][$os]['over'][0]['text']   = "Processor Usage";
 $config['os'][$os]['over'][1]['graph']  = "device_ucd_memory";
@@ -103,6 +106,12 @@ $config['os'][$os]['type']              = "storage";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "QNAP TurboNAS";
 $config['os'][$os]['ifXmcbc']           = 1;
+
+$os = "netapp";
+$config['os'][$os]['type']              = "storage";
+$config['os'][$os]['text']              = "NetApp";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "endian";
 $config['os'][$os]['text']              = "Endian";
@@ -433,6 +442,15 @@ $config['os'][$os]['text']              = "Supermicro Switch";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "supermicro";
 $config['os'][$os]['ifname']            = 1;
+
+// Netgear ProSafe switches
+$os = "netgear";
+$config['os'][$os]['text']              = "Netgear ProSafe";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['bad_if'][]          = "cpu";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 # Juniper
 
@@ -1078,6 +1096,21 @@ $os = "datacom";
 $config['os'][$os]['text']              = "Datacom";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['icon']              = "datacom";
+
+// UBNT EdgeSwitch 750W
+$os = "edgeswitch";
+$config['os'][$os]['text']              = "EdgeSwitch";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "ubiquiti";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['ifname']            = 1;
+
+// Fiberhome
+$os = "fiberhome";
+$config['os'][$os]['text']              = "Fiberhome";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "fiberhome";
 
 foreach ($config['os'] as $this_os => $blah)
 {
@@ -1730,6 +1763,7 @@ if ($config['memcached']['enable'])
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
 $config['time']['now']        = time();
+$config['time']['now']       -= $config['time']['now']%300;
 $config['time']['fourhour']   = $config['time']['now'] - 14400;    //time() - (4 * 60 * 60);
 $config['time']['sixhour']    = $config['time']['now'] - 21600;    //time() - (6 * 60 * 60);
 $config['time']['twelvehour'] = $config['time']['now'] - 43200;    //time() - (12 * 60 * 60);

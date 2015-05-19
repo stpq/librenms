@@ -125,6 +125,7 @@ $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
 $config['int_transit']             = 1;  # Enable Transit Types
 $config['int_peering']             = 1;  # Enable Peering Types
 $config['int_core']                = 1;  # Enable Core Port Types
@@ -275,6 +276,14 @@ Rancid configuration, `rancid_configs` is an array containing all of the locatio
 Setting `rancid_ignorecomments` will disable showing lines that start with #
 
 ```php
+$config['oxidized']['enabled']         = FALSE;
+$config['oxidized']['url']             = 'http://127.0.0.1:8888';
+```
+To enable Oxidized support set enabled to `TRUE`. URL needs to be configured to point to the REST API for Oxidized. This 
+is then used to retrieve the config for devices.
+
+
+```php
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
 Specify the location of the collectd rrd files.
@@ -313,6 +322,16 @@ by continuing the array.
 `bad_if` is matched against the ifDescr value.
 `bad_iftype` is matched against the ifType value.
 `bad_if_regexp` is matched against the ifDescr value as a regular expression.
+
+#### Interfaces to be rewritten
+
+```php
+$config['rewrite_if']['cpu'] = 'Management Interface';
+$config['rewrite_if_regexp']['/cpu /'] = 'Management ';
+```
+Entries defined in `rewrite_if` are being replaced completely.
+Entries defined in `rewrite_if_regexp` only replace the match.
+Matches are compared case-insensitive.
 
 #### Storage configuration
 
@@ -411,6 +430,17 @@ You can use this array to rewrite the description of ASes that you have discover
 $config['update'] = 1;
 ```
 By default, LibreNMS will auto update itself every 24 hours. You can stop this from happening by setting `update` to 0.
+
+#### IPMI
+Setup the types of IPMI protocols to test a host for and it what order.
+
+```php
+$config['ipmi']['type'] = array();
+$config['ipmi']['type'][] = "lanplus";
+$config['ipmi']['type'][] = "lan";
+$config['ipmi']['type'][] = "imb";
+$config['ipmi']['type'][] = "open";
+```
 
 #### Distributed poller settings
 
